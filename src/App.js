@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from './firebase';
-import { collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import Map from './components/Map'; // Importă componenta Map
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';  // removed addDoc
+import Map from './components/Map';
 import { GlobalStyles } from './styles/global';
 import { UtilityStyles } from './styles/utilities';
 import Navbar from './components/Navbar';
@@ -13,11 +13,14 @@ import './App.css';
 
 function App() {
   const [items, setItems] = useState([]);
+  // Commented out form state since we're not using it temporarily
+  /*
   const [formData, setFormData] = useState({
     name: '',
     location: '',
     description: ''
   });
+  */
 
   // Fetch items from Firebase
   useEffect(() => {
@@ -33,7 +36,8 @@ function App() {
     fetchItems();
   }, []);
 
-  // Handle form submission
+  // Commented out form submission handler
+  /*
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -53,6 +57,7 @@ function App() {
       console.error("Error adding document: ", error);
     }
   };
+  */
 
   // Handle deletion
   const handleDelete = async (id) => {
@@ -74,12 +79,14 @@ function App() {
       <main>
         <Hero />
         <ExploreSection />
-        <FAQ />
+        <div id="faq-section" style={{ scrollMarginTop: '80px' }}>
+          <FAQ />
+        </div>
       </main>
-      <Footer />
+      {/* <Footer /> */}
       
-      <div>
-        {/* Formul pentru adăugarea locațiilor */}
+      <div id="map-section" style={{ scrollMarginTop: '80px' }}>
+        {/* Commented out form for adding locations
         <form onSubmit={handleSubmit} className="add-form">
           <input
             type="text"
@@ -101,8 +108,9 @@ function App() {
           />
           <button type="submit">Add Location</button>
         </form>
+        */}
 
-        {/* Table with locations */}
+        {/* Commented out table with locations 
         <table className="locations-table">
           <thead>
             <tr>
@@ -125,6 +133,7 @@ function App() {
             ))}
           </tbody>
         </table>
+        */}
 
         {/* Map Component */}
         <Map locations={items} />
