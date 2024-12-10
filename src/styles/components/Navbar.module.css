@@ -1,0 +1,32 @@
+header {
+  background-color: var(--clr-yellow);
+  padding: 1rem 0;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.nav > * {
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  gap: 5rem;
+  padding: 1rem 0;
+}
+
+@media only screen and (min-width: 900px) {
+  .nav {
+    justify-content: space-between;
+    flex-direction: row;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .nav > * {
+    gap: 3rem;
+  }
+}
+

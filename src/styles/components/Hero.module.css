@@ -1,0 +1,50 @@
+.hero {
+    background-image: url('../../images/hero.png');
+    width: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 85vh;
+    display: flex;
+    justify-content: center;
+  }
+
+  .hero-wrap {
+    max-width: 855px;
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  .hero__buttons {
+    display: flex;
+    gap: 5rem;
+    justify-content: center;
+  }
+
+  .hero__buttons a {
+    flex-basis: 170px;
+    padding: 1.8rem 0rem;
+    font-weight: 500;
+  }
+
+  .hero__desc {
+    font-size: var(--font-large);
+    color: var(--clr-lighter-black);
+    padding: 2rem 2rem;
+  }
+
+  @media only screen and (min-width: 900px) {
+    .hero-wrap {
+      padding: 11rem 0;
+    }
+  }
+
+  @media only screen and (max-width: 500px) {
+    .hero-wrap {
+      padding: 2rem 2rem;
+    }
+
+    .hero__buttons {
+      gap: 1rem;
+    }
+  }

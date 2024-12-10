@@ -1,0 +1,67 @@
+.explore {
+    overflow: hidden;
+    padding-block: 8rem;
+  }
+
+  .explore-section-title-wrapper {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .explore-cards {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 7rem;
+    margin-bottom: 7rem;
+    scrollbar-color: var(--clr-yellow) rgba(119, 109, 109, 35%);
+    scrollbar-width: thin;
+  }
+
+  .explore-cards::-webkit-scrollbar {
+    height: 0.7em;
+  }
+
+  .explore-cards::-webkit-scrollbar-track {
+    background-color: rgba(119, 109, 109, 35%);
+    border-top: 0.4em solid white;
+  }
+
+  .explore-cards::-webkit-scrollbar-thumb {
+    background-color: var(--clr-yellow);
+  }
+
+  .explore-card {
+    background-color: #f7f7f7;
+    border-radius: 30px;
+    padding: 1rem;
+    flex: 0 0 50%;
+  }
+
+  .explore-card + .explore-card {
+    margin-left: 2rem;
+  }
+
+  @media only screen and (min-width: 900px) {
+    .explore-card {
+      padding: 2rem;
+      flex: 0 0 32.5%;
+    }
+
+    .explore-card__title {
+      font-size: var(--font-large);
+    }
+
+    .explore-section__title {
+      padding-bottom: 0;
+    }
+  }
+
+  @media only screen and (max-width: 500px) {
+    .explore {
+      padding-block: 2rem;
+    }
+  }
