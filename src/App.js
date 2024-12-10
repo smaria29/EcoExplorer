@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { db } from './firebase';
 import { collection, addDoc, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import Map from './components/Map';  // Importă componenta Map
 import './App.css';
-
 
 function App() {
   const [items, setItems] = useState([]);
@@ -67,19 +67,19 @@ function App() {
           type="text"
           placeholder="Name"
           value={formData.name}
-          onChange={(e) => setFormData({...formData, name: e.target.value})}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
         />
         <input
           type="text"
-          placeholder="Location"
+          placeholder="Location (latitude,longitude)"
           value={formData.location}
-          onChange={(e) => setFormData({...formData, location: e.target.value})}
+          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
         />
         <input
           type="text"
           placeholder="Description"
           value={formData.description}
-          onChange={(e) => setFormData({...formData, description: e.target.value})}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         />
         <button type="submit">Add Location</button>
       </form>
@@ -107,6 +107,9 @@ function App() {
           ))}
         </tbody>
       </table>
+
+      {/* Map Component */}
+      <Map locations={items} />
     </div>
   );
 }
