@@ -17,6 +17,40 @@ header {
   padding: 1rem 0;
 }
 
+.nav-logo-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.nav__logo {
+  height: 40px; /* Ajustează înălțimea după necesități */
+  width: auto;
+  object-fit: contain;
+}
+
+.nav__list {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav__item {
+  margin: 0;
+}
+
+.nav__link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.nav__right {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
 @media only screen and (min-width: 900px) {
   .nav {
     justify-content: space-between;
@@ -29,4 +63,3 @@ header {
     gap: 3rem;
   }
 }
-

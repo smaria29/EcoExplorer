@@ -1,0 +1,100 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+  }
+  
+  .closeButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border: none;
+    background: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  
+  .formGroup {
+    margin-bottom: 1rem;
+  }
+  
+  .formGroup label {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .formGroup input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .submitButton {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--clr-yellow);
+    border: none;
+    border-radius: 4px;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 1rem;
+  }
+  
+  .error {
+    color: red;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid red;
+    border-radius: 4px;
+    background-color: rgba(255, 0, 0, 0.1);
+  }
+  
+  .switchMode {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  
+  .switchButton {
+    background: none;
+    border: none;
+    color: var(--clr-yellow);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+
+  .success {
+    color: green;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid green;
+    border-radius: 4px;
+    background-color: rgba(0, 255, 0, 0.1);
+  }
+  
+  .switchMode {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  
+  .switchMode p {
+    margin: 0.5rem 0;
+  }
