@@ -21,6 +21,27 @@
     justify-content: center;
   }
 
+
+  .btn {
+    display: flex;
+    justify-content: center;  /* Center content horizontally */
+    align-items: center;      /* Center content vertically */
+    padding: 10px 20px;       /* Ajustează padding-ul dacă este necesar */
+    text-align: center;       /* Asigură că textul este centrat */
+  }
+  
+  .btn-border {
+    border: 2px solid #000;  /* Exemplu de border, poți să-l ajustezi */
+    color: #000;
+    text-decoration: none;    /* Dacă nu vrei underline */
+    font-size: 16px;          /* Ajustează font-size-ul după preferințe */
+  }
+  
+  .hero__buttons .btn {
+    width: auto;  /* Poți ajusta lățimea dacă vrei să fie mai mare sau mică */
+  }
+  
+
   .hero__buttons a {
     flex-basis: 170px;
     padding: 1.8rem 0rem;

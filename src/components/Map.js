@@ -5,110 +5,75 @@ const ProtectedAreasViewer = () => {
   const [locations, setLocations] = useState({
     mountains: [],
     lakes: [],
-    gorges: []
+    gorges: [],
   });
   const [view, setView] = useState(null);
+  const [arcgisModules, setArcgisModules] = useState(null); // Stocăm modulele ArcGIS
 
   useEffect(() => {
     const loadArcGIS = () => {
-      window.require([
-        'esri/Graphic',  // Adăugăm aici Graphic pentru a-l accesa din require
-        'esri/WebMap',
-        'esri/views/MapView',
-        'esri/widgets/BasemapToggle',
-        'esri/widgets/BasemapGallery',
-        'esri/widgets/Measurement',
-        'esri/widgets/Search',
-        'esri/geometry/Point',
-        'esri/symbols/SimpleFillSymbol',
-        'esri/geometry/Polygon'
-      ], function (
-        Graphic, WebMap, MapView, BasemapToggle, BasemapGallery, Measurement, Search, Point, SimpleFillSymbol, Polygon
-      ) {
-        const webmap = new WebMap({
-          portalItem: {
-            id: 'da4d9919e00041b1a5ab416329d5c1a9'
-          }
-        });
+      window.require(
+        [
+          'esri/Graphic',
+          'esri/WebMap',
+          'esri/views/MapView',
+          'esri/widgets/BasemapToggle',
+          'esri/widgets/BasemapGallery',
+          'esri/widgets/Measurement',
+          'esri/widgets/Search',
+        ],
+        function (
+          Graphic,
+          WebMap,
+          MapView,
+          BasemapToggle,
+          BasemapGallery,
+          Measurement,
+          Search
+        ) {
+          // Stocăm modulele în state
+          setArcgisModules({ Graphic });
 
-        const mapView = new MapView({
-          container: 'viewDiv',
-          map: webmap,
-          zoom: 7,
-          center: [25.0, 46.0], // Centrat aproximativ pe România
-        });
+          const webmap = new WebMap({
+            portalItem: {
+              id: 'da4d9919e00041b1a5ab416329d5c1a9',
+            },
+          });
 
-        setView(mapView);
+          const mapView = new MapView({
+            container: 'viewDiv',
+            map: webmap,
+            zoom: 7,
+            center: [25.0, 46.0], // Centrat aproximativ pe România
+          });
 
-        // Widget de schimbare basemap
-        const basemapToggle = new BasemapToggle({
-          view: mapView,
-          nextBasemap: 'satellite',
-        });
-        mapView.ui.add(basemapToggle, 'bottom-right');
+          setView(mapView);
 
-        // Galeria de basemaps
-        const basemapGallery = new BasemapGallery({
-          view: mapView,
-        });
-        mapView.ui.add(basemapGallery, 'top-right');
+          // Adăugăm widget-uri la interfață
+          const basemapToggle = new BasemapToggle({
+            view: mapView,
+            nextBasemap: 'satellite',
+          });
+          mapView.ui.add(basemapToggle, 'bottom-right');
 
-        // Widget-ul de măsurare
-        const measurementWidget = new Measurement({
-          view: mapView,
-          activeTool: 'distance',
-        });
-        mapView.ui.add(measurementWidget, 'top-left');
+          const basemapGallery = new BasemapGallery({
+            view: mapView,
+          });
+          mapView.ui.add(basemapGallery, 'top-right');
 
-        // Widget-ul de căutare
-        const searchWidget = new Search({
-          view: mapView,
-          popupEnabled: false,
-        });
-        mapView.ui.add(searchWidget, 'top-left'); 
+          const measurementWidget = new Measurement({
+            view: mapView,
+            activeTool: 'distance',
+          });
+          mapView.ui.add(measurementWidget, 'top-left');
 
-        searchWidget.on('search-complete', (event) => {
-          if (event.results.length > 0 && event.results[0].results.length > 0) {
-            const result = event.results[0].results[0];
-            const geometry = result.feature.geometry;
-
-            // Verifică categoria și setează culoarea în funcție de aceasta
-            const category = result.feature.attributes['Zona Protejata']; 
-            let fillColor;
-            if (category && category.startsWith('M')) {
-              fillColor = [0, 0, 255, 0.4]; // Albastru pentru munți
-            } else if (category && category.startsWith('B')) {
-              fillColor = [128, 0, 128, 0.4]; // Mov pentru balti
-            } else if (category && category.startsWith('C')) {
-              fillColor = [255, 255, 0, 0.4]; // Galben pentru chei
-            }
-
-            // Creăm simbolul pentru colorarea regiunii
-            const fillSymbol = new SimpleFillSymbol({
-              color: fillColor,
-              outline: {
-                color: [255, 255, 255],
-                width: 2
-              }
-            });
-
-            // Creăm un graphic pentru zona găsită
-            const graphic = new Graphic({
-              geometry: geometry,
-              symbol: fillSymbol
-            });
-
-            mapView.graphics.removeAll();
-            mapView.graphics.add(graphic);
-
-            // Facem zoom la zona selectată
-            mapView.goTo({
-              target: geometry,
-              zoom: 14
-            });
-          }
-        });
-      });
+          const searchWidget = new Search({
+            view: mapView,
+            popupEnabled: false,
+          });
+          mapView.ui.add(searchWidget, 'top-left');
+        }
+      );
     };
 
     const script = document.createElement('script');
@@ -118,38 +83,80 @@ const ProtectedAreasViewer = () => {
 
     // Încarcă datele din CSV
     fetch('/locatii_coordonate.csv')
-      .then(response => response.text())
-      .then(csvData => {
+      .then((response) => response.text())
+      .then((csvData) => {
         Papa.parse(csvData, {
           header: true,
           complete: (results) => {
-            const validLocations = results.data.filter(loc => 
-              loc.Latitude && 
-              loc.Longitude && 
-              !isNaN(parseFloat(loc.Latitude)) && 
-              !isNaN(parseFloat(loc.Longitude))
+            const validLocations = results.data.filter(
+              (loc) =>
+                loc.Latitude &&
+                loc.Longitude &&
+                !isNaN(parseFloat(loc.Latitude)) &&
+                !isNaN(parseFloat(loc.Longitude))
             );
-            
-            // Filtrăm datele pe categorii
-            const mountains = validLocations.filter(loc => loc['Zona Protejata'].startsWith('M'));
-            const lakes = validLocations.filter(loc => loc['Zona Protejata'].startsWith('B'));
-            const gorges = validLocations.filter(loc => loc['Zona Protejata'].startsWith('C'));
+
+            const mountains = validLocations.filter((loc) =>
+              loc['Zona Protejata'].startsWith('M')
+            );
+            const lakes = validLocations.filter((loc) =>
+              loc['Zona Protejata'].startsWith('B')
+            );
+            const gorges = validLocations.filter((loc) =>
+              loc['Zona Protejata'].startsWith('C')
+            );
 
             setLocations({
               mountains,
               lakes,
-              gorges
+              gorges,
             });
-          }
+          },
         });
       });
   }, []);
 
   const handleLocationClick = (location) => {
-    if (view) {
+    if (view && arcgisModules) {
+      const { Graphic } = arcgisModules;
+      const { Longitude, Latitude, 'Zona Protejata': zonaProtejata } = location;
+
+      let fillColor;
+      if (zonaProtejata.startsWith('M')) {
+        fillColor = [0, 0, 255, 0.4]; // Albastru pentru munți
+      } else if (zonaProtejata.startsWith('B')) {
+        fillColor = [128, 0, 128, 0.4]; // Mov pentru bălți
+      } else if (zonaProtejata.startsWith('C')) {
+        fillColor = [255, 255, 0, 0.4]; // Galben pentru chei
+      }
+
+      const point = {
+        type: 'point',
+        longitude: parseFloat(Longitude),
+        latitude: parseFloat(Latitude),
+      };
+
+      const simpleMarkerSymbol = {
+        type: 'simple-marker',
+        color: fillColor,
+        size: 100,
+        outline: {
+          color: [255, 255, 255], // Alb pentru contur
+          width: 1,
+        },
+      };
+
+      const graphic = new Graphic({
+        geometry: point,
+        symbol: simpleMarkerSymbol,
+      });
+
+      view.graphics.removeAll();
+      view.graphics.add(graphic);
+
       view.goTo({
-        center: [parseFloat(location.Longitude), parseFloat(location.Latitude)],
-        zoom: 12
+        center: [parseFloat(Longitude), parseFloat(Latitude)],
+        zoom: 12,
       });
     }
   };
@@ -157,8 +164,18 @@ const ProtectedAreasViewer = () => {
   return (
     <div style={{ width: '100%', height: '100vh', display: 'flex' }}>
       <div id="viewDiv" style={{ width: '70%', height: '100%' }}></div>
-      <div style={{ width: '30%', height: '100%', overflowY: 'auto', padding: '1rem', backgroundColor: '#f3f4f6' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Zone Protejate</h2>
+      <div
+        style={{
+          width: '30%',
+          height: '100%',
+          overflowY: 'auto',
+          padding: '1rem',
+          backgroundColor: '#f3f4f6',
+        }}
+      >
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+          Zone Protejate
+        </h2>
         <div>
           <h3>Munți</h3>
           {locations.mountains.map((location, index) => (
@@ -173,7 +190,7 @@ const ProtectedAreasViewer = () => {
                 backgroundColor: 'white',
                 border: '1px solid #e5e7eb',
                 borderRadius: '0.25rem',
-                cursor: 'pointer'
+                cursor: 'pointer',
               }}
             >
               {location['Zona Protejata']}
@@ -189,10 +206,10 @@ const ProtectedAreasViewer = () => {
                 textAlign: 'left',
                 padding: '0.5rem',
                 marginBottom: '0.5rem',
-                backgroundColor: 'white',
-                border: '1px solid #e5e7eb',
+                backgroundColor: 'rgba(128, 0, 128, 0.2)', // Mov
+                border: '1px solid rgba(128, 0, 128, 0.5)',
                 borderRadius: '0.25rem',
-                cursor: 'pointer'
+                cursor: 'pointer',
               }}
             >
               {location['Zona Protejata']}
@@ -208,10 +225,10 @@ const ProtectedAreasViewer = () => {
                 textAlign: 'left',
                 padding: '0.5rem',
                 marginBottom: '0.5rem',
-                backgroundColor: 'white',
-                border: '1px solid #e5e7eb',
+                backgroundColor: 'rgba(255, 255, 0, 0.2)', // Galben
+                border: '1px solid rgba(255, 255, 0, 0.5)',
                 borderRadius: '0.25rem',
-                cursor: 'pointer'
+                cursor: 'pointer',
               }}
             >
               {location['Zona Protejata']}

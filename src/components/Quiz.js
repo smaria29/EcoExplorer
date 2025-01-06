@@ -262,11 +262,13 @@ const Quiz = () => {
   const [expandedQuiz, setExpandedQuiz] = useState(null);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [score, setScore] = useState(null);
 
   const toggleQuiz = (quizId) => {
     setExpandedQuiz(expandedQuiz === quizId ? null : quizId);
     setSubmitted(false);
     setSelectedAnswers({});
+    setScore(null);
   };
 
   const handleAnswerSelect = (questionIndex, answer) => {
@@ -276,51 +278,46 @@ const Quiz = () => {
     });
   };
 
-  // Funcția pentru a salva răspunsurile utilizatorilor
-  const saveAnswersToFirestore = async (quizId, answers) => {
+  const saveAnswersToFirestore = async (quizId, answers, userScore) => {
     try {
-      const docRef = await addDoc(collection(db, "userAnswers"), {
+      const docRef = await addDoc(collection(db, 'userAnswers'), {
         quizId,
         answers,
-        timestamp: new Date()
+        score: userScore,
+        timestamp: new Date(),
       });
-      console.log("Document scris cu ID-ul: ", docRef.id);
+      console.log('Document scris cu ID-ul: ', docRef.id);
     } catch (e) {
-      console.error("Eroare la adăugarea documentului: ", e);
+      console.error('Eroare la adăugarea documentului: ', e);
     }
   };
 
   const handleSubmit = () => {
     setSubmitted(true);
-  
-    // Găsim quiz-ul curent în array-ul `quizzes`
+
     const currentQuiz = quizzes.find((quiz) => quiz.id === expandedQuiz);
-    if (!currentQuiz) return; // Dacă nu găsim quiz-ul, ieșim
-  
+    if (!currentQuiz) return;
+
+    let correctAnswersCount = 0;
     const results = Object.keys(selectedAnswers).map((questionIndex) => {
-      const userAnswer = selectedAnswers[questionIndex]; // Răspunsul utilizatorului
-      const correctAnswer = currentQuiz.questions[questionIndex].correctAnswer; // Răspunsul corect
-  
-      console.log(`Întrebare: ${questionIndex}`);
-      console.log(`Răspuns utilizator (neprocesat): "${userAnswer}"`);
-      console.log(`Răspuns corect (neprocesat): "${correctAnswer}"`);
-  
-      // Comparăm răspunsurile (fără formatare) pentru a depista orice diferențe
+      const userAnswer = selectedAnswers[questionIndex];
+      const correctAnswer = currentQuiz.questions[questionIndex].correctAnswer;
+
       const isCorrect = userAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase() ? 1 : 0;
-  
-      // Logăm rezultatul comparației
-      console.log(`Răspunsul este: ${isCorrect === 1 ? 'Corect' : 'Greșit'}`);
-  
+
+      if (isCorrect) correctAnswersCount++;
+
       return {
         questionIndex,
         isCorrect,
       };
     });
-  
-    // Trimite rezultatele către Firestore
-    saveAnswersToFirestore(expandedQuiz, results);
+
+    const userScore = correctAnswersCount; // Scorul utilizatorului
+    setScore(userScore); // Setează scorul
+
+    saveAnswersToFirestore(expandedQuiz, results, userScore); // Salvează în Firestore
   };
-  
 
   return (
     <div className="quiz-container">
@@ -371,6 +368,11 @@ const Quiz = () => {
                 <button onClick={handleSubmit} className="submit-button">
                   Trimite răspunsurile
                 </button>
+              )}
+              {submitted && score !== null && (
+                <div className="score">
+                  <h3>Scorul tău este: {score}/3</h3>
+                </div>
               )}
             </div>
           )}

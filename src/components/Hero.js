@@ -13,9 +13,8 @@ const Hero = () => {
           cunoștințele prin quiz-uri interactive. Educația ecologică începe aici!
         </p>
         <div className={styles['hero__buttons']}>
-          <a className="btn btn-white" href="#">Sa incepem</a>
           <Link className="btn btn-border" to="/quiz">
-            Afla mai multe <ArrowRight className={styles.inline} />
+            Afla mai multe 
           </Link>
         </div>
       </div>
