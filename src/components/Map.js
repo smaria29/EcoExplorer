@@ -7,21 +7,111 @@ const ProtectedAreasViewer = () => {
 
   useEffect(() => {
     const loadArcGIS = () => {
-      window.require(['esri/WebMap', 'esri/views/MapView'], function(WebMap, MapView) {
+      window.require([
+        'esri/WebMap',
+        'esri/views/MapView',
+        'esri/widgets/BasemapToggle',
+        'esri/widgets/BasemapGallery',
+        'esri/widgets/Measurement',
+        'esri/widgets/Search',
+        'esri/Graphic',
+        'esri/geometry/geometryEngine'
+      ], function(
+        WebMap,
+        MapView,
+        BasemapToggle,
+        BasemapGallery,
+        Measurement,
+        Search,
+        Graphic,
+        geometryEngine
+      ) {
         const webmap = new WebMap({
           portalItem: {
             id: 'da4d9919e00041b1a5ab416329d5c1a9'
           }
         });
 
-        const view = new MapView({
+        const mapView = new MapView({
           container: 'viewDiv',
           map: webmap,
           zoom: 7,
-          center: [25.0, 46.0]  // Centrat aproximativ pe România
+          center: [25.0, 46.0], // Centrat aproximativ pe România
         });
 
-        setView(view);
+        // Adăugăm widget-ul de schimbare basemap
+        const basemapToggle = new BasemapToggle({
+          view: mapView,
+          nextBasemap: 'satellite',
+        });
+
+        mapView.ui.add(basemapToggle, 'bottom-right');
+
+        // Adăugăm galeria de basemaps
+        const basemapGallery = new BasemapGallery({
+          view: mapView,
+        });
+
+        mapView.ui.add(basemapGallery, 'top-right');
+
+        // Widget-ul de măsurare
+        const measurementWidget = new Measurement({
+          view: mapView,
+          activeTool: 'distance',
+        });
+
+        mapView.ui.add(measurementWidget, 'top-left');
+
+        // Widget-ul de căutare
+        const searchWidget = new Search({
+          view: mapView,
+          popupEnabled: false, // Dezactivăm popup-urile implicite
+        });
+
+        mapView.ui.add(searchWidget, 'top-left'); // Adăugăm widget-ul de căutare
+
+        // Gestionăm rezultatele căutării
+        searchWidget.on('search-complete', (event) => {
+          if (event.results.length > 0 && event.results[0].results.length > 0) {
+            const result = event.results[0].results[0];
+
+            // Creăm un marker pentru locația găsită
+            const highlightGraphic = new Graphic({
+              geometry: result.feature.geometry,
+              symbol: {
+                type: 'simple-marker',
+                style: 'circle',
+                color: 'red',
+                size: '12px',
+                outline: {
+                  color: 'white',
+                  width: 2,
+                },
+              },
+            });
+
+            // Adăugăm marker-ul pe hartă
+            mapView.graphics.removeAll();
+            mapView.graphics.add(highlightGraphic);
+
+            // Facem zoom la locația găsită
+            mapView.goTo({
+              target: result.feature.geometry,
+              zoom: 14,
+            });
+          }
+        });
+
+        // Gestionăm evenimentele widget-ului de măsurare
+        measurementWidget.on('measure-complete', (event) => {
+          console.log('Distanță măsurată:', event.result.distance, event.result.unit);
+        });
+
+        measurementWidget.on('area-complete', (event) => {
+          console.log('Zona măsurată:', event.result.area, event.result.unit);
+        });
+
+        setView(mapView);
       });
     };
 
