@@ -109,3 +109,56 @@
       padding-block: 2rem;
   }
 }
+
+
+/* Stilează overlay-ul și conținutul modalului */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7); /* Fundal închis */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  width: 80%;
+  max-width: 600px;
+  position: relative;
+  text-align: center;
+  border-radius: 10px;
+}
+
+.modal-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.modal-title {
+  margin-top: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.modal-description {
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #333;
+}
