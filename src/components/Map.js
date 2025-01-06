@@ -1,50 +1,93 @@
-import React, { useEffect, useRef } from 'react';
-import { loadModules } from 'esri-loader';
+import React, { useState, useEffect } from 'react';
+import Papa from 'papaparse';
 
-const Map = () => {
-  const mapRef = useRef(null);
+const ProtectedAreasViewer = () => {
+  const [locations, setLocations] = useState([]);
+  const [view, setView] = useState(null);
 
   useEffect(() => {
-    loadModules(['esri/views/MapView', 'esri/WebMap'], { 
-      css: true,
-      apiKey: 'YOUR_API_KEY' // Asigură-te că ai introdus un API Key valid
-    })
-      .then(([MapView, WebMap]) => {
-        const webMap = new WebMap({
+    const loadArcGIS = () => {
+      window.require(['esri/WebMap', 'esri/views/MapView'], function(WebMap, MapView) {
+        const webmap = new WebMap({
           portalItem: {
-            id: '53e25fa2dce74e64861243ac67995a22', // ID-ul hărții
-          },
+            id: 'da4d9919e00041b1a5ab416329d5c1a9'
+          }
         });
 
         const view = new MapView({
-          container: mapRef.current,
-          map: webMap,
-          center: [24.9668, 45.9432], // Coordonatele centrului României
-          zoom: 7, // Setează zoom-ul pentru a fi potrivit României
-          constraints: {
-            // Limitează panning-ul pentru a nu ieși din România
-            minZoom: 7,  // Zoom minim
-            maxZoom: 10, // Zoom maxim
-            geometry: {
-              type: "extent",
-              xmin: 20.8, // Coordonatele stângi pentru România
-              ymin: 44.2, // Coordonatele sudice pentru România
-              xmax: 30.0, // Coordonatele drepte pentru România
-              ymax: 48.3  // Coordonatele nordice pentru România
-            }
-          }
+          container: 'viewDiv',
+          map: webmap,
+          zoom: 7,
+          center: [25.0, 46.0]  // Centrat aproximativ pe România
         });
 
-        return () => {
-          if (view) {
-            view.destroy();
+        setView(view);
+      });
+    };
+
+    // Încarcă scriptul ArcGIS
+    const script = document.createElement('script');
+    script.src = 'https://js.arcgis.com/4.27/';
+    script.onload = loadArcGIS;
+    document.head.appendChild(script);
+
+    // Încarcă datele din CSV
+    fetch('/locatii_coordonate.csv')
+      .then(response => response.text())
+      .then(csvData => {
+        Papa.parse(csvData, {
+          header: true,
+          complete: (results) => {
+            const validLocations = results.data.filter(loc => 
+              loc.Latitude && 
+              loc.Longitude && 
+              !isNaN(parseFloat(loc.Latitude)) && 
+              !isNaN(parseFloat(loc.Longitude))
+            ).sort((a, b) => a['Zona Protejata'].localeCompare(b['Zona Protejata']));
+            
+            setLocations(validLocations);
           }
-        };
-      })
-      .catch((err) => console.error(err));
+        });
+      });
   }, []);
 
-  return <div style={{ height: '100vh', width: '100%' }} ref={mapRef}></div>;
+  const handleLocationClick = (location) => {
+    if (view) {
+      view.goTo({
+        center: [parseFloat(location.Longitude), parseFloat(location.Latitude)],
+        zoom: 12
+      });
+    }
+  };
+
+  return (
+    <div style={{ width: '100%', height: '100vh', display: 'flex' }}>
+      <div id="viewDiv" style={{ width: '70%', height: '100%' }}></div>
+      <div style={{ width: '30%', height: '100%', overflowY: 'auto', padding: '1rem', backgroundColor: '#f3f4f6' }}>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem' }}>Zone Protejate</h2>
+        <div>
+          {locations.map((location, index) => (
+            <button
+              key={index}
+              onClick={() => handleLocationClick(location)}
+              style={{
+                width: '100%',
+                textAlign: 'left',
+                padding: '0.5rem',
+                marginBottom: '0.5rem',
+                backgroundColor: 'white',
+                border: '1px solid #e5e7eb',
+                borderRadius: '0.25rem',
+                cursor: 'pointer'
+              }}
+            >
+              {location['Zona Protejata']}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 };
 
-export default Map;
+export default ProtectedAreasViewer;
